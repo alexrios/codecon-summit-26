@@ -39,6 +39,9 @@ jobs:
       - run: |
           mkdir -p site/codecon-summit-26
           cp -r dist/. site/codecon-summit-26/
+          # SPA fallback: GitHub Pages serves 404.html for unknown paths like
+          # /codecon-summit-26/2, letting the Slidev router take over.
+          cp dist/index.html site/404.html
           printf '<meta http-equiv="refresh" content="0; url=/codecon-summit-26/">' > site/index.html
           touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
