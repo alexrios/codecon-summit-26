@@ -1,0 +1,44 @@
+# Funil de investigação: contraste entre página por causa (beco sem saída)
+# e página por sintoma com causas como contexto (entrada via MELT).
+
+sketch: true
+
+direction: right
+
+classes: {
+  bad: {
+    style.fill: "#E53E3E"
+    style.font-color: white
+    style.border-radius: 6
+  }
+  good: {
+    style.fill: "#38A169"
+    style.font-color: white
+    style.border-radius: 6
+  }
+  neutral: {
+    style.fill: "#4A90D9"
+    style.font-color: white
+    style.border-radius: 6
+  }
+}
+
+sintoma: {
+  label: "Página por causa"
+  direction: right
+  fire: "CPU em 85%" { class: bad }
+  onde: "Tem usuário\nafetado?" { class: bad }
+  manual: "45 min pulando\nlog por log" { class: bad }
+  fire -> onde -> manual
+}
+
+acionavel: {
+  label: "Página por sintoma + contexto"
+  direction: right
+  fire: "SLO de checkout\nqueimando 10x" { class: good }
+  impacto: "12% dos usuários\nafetados" { class: good }
+  trace: "Também disparando:\npayment timeouts" { class: neutral }
+  log: "Log filtrado pelo\nmesmo correlation ID" { class: neutral }
+  causa: "Causa raiz\nem 5 min" { class: good }
+  fire -> impacto -> trace -> log -> causa
+}

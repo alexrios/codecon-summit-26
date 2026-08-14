@@ -1,0 +1,60 @@
+# Modelo conceitual: os quatro sinais (MELT) e o correlation/trace ID
+# como tecido conjuntivo que permite pivotar de um sinal para o outro.
+
+sketch: true
+
+direction: down
+
+classes: {
+  signal: {
+    style.border-radius: 8
+    style.font-color: white
+  }
+}
+
+thread: "Correlation / Trace ID" {
+  style.fill: "#1A202C"
+  style.font-color: white
+  style.bold: true
+  style.border-radius: 8
+}
+
+metrics: "Metrics\n\nSinal agregado.\n'Algo está errado.'\n(o detector de fumaça)" {
+  class: signal
+  style.fill: "#4A90D9"
+  width: 320
+  height: 180
+}
+
+events: "Events\n\nFatos discretos.\n'Isso aconteceu.'\n(a foto da troca de fiação)" {
+  class: signal
+  style.fill: "#805AD5"
+  width: 320
+  height: 180
+}
+
+logs: "Logs\n\nNarrativa detalhada.\n'O que exatamente aconteceu.'\n(o boletim de ocorrência)" {
+  class: signal
+  style.fill: "#48BB78"
+  width: 320
+  height: 180
+}
+
+traces: "Traces\n\nCadeia causal entre serviços.\n'Por onde o tempo/erro passou.'\n(o mapa do prédio)" {
+  class: signal
+  style.fill: "#ED8936"
+  width: 320
+  height: 180
+}
+
+thread -> metrics: aponta a janela de tempo
+thread -> traces: aponta o span problemático
+thread -> logs: filtra a narrativa exata
+thread -> events: correlaciona com mudanças recentes
+
+sem_thread: "Sem o correlation ID atravessando fila,\nretry e job assíncrono, os quatro sinais\nsão quatro ilhas desconectadas." {
+  style.fill: "#FFF5F5"
+  style.stroke: "#E53E3E"
+  style.italic: true
+  width: 460
+}

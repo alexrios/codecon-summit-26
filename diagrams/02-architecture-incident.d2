@@ -1,0 +1,61 @@
+# Mesma arquitetura, durante a investigação do incidente.
+# Cada serviço tem seu próprio log, isolado, sem correlation ID atravessando as fronteiras.
+# O ponto visual: o engenheiro pula de ilha em ilha sem conseguir montar a história.
+
+sketch: true
+
+direction: right
+
+classes: {
+  svc: {
+    style.fill: "#4A90D9"
+    style.font-color: white
+    style.border-radius: 6
+  }
+  queue: {
+    shape: queue
+    style.fill: "#ECC94B"
+    style.font-color: "#1A202C"
+  }
+  external: {
+    style.fill: "#999999"
+    style.font-color: white
+  }
+  log: {
+    shape: page
+    style.fill: "#FED7D7"
+    style.stroke: "#E53E3E"
+    style.font-size: 12
+  }
+}
+
+gateway: API Gateway { class: svc }
+orders_q: Fila de Pedidos { class: queue }
+payment: Serviço de Pagamento { class: svc }
+provider: Provedor de Pagamento Externo { class: external }
+
+gateway -> orders_q
+orders_q -> payment
+payment -> provider
+
+gateway_log: "log: 502, 502, 502..." { class: log }
+orders_log: "log: fila crescendo" { class: log }
+payment_log: "log: timeout, timeout..." { class: log }
+
+gateway -> gateway_log: produz { style.stroke-dash: 2 }
+orders_q -> orders_log: produz { style.stroke-dash: 2 }
+payment -> payment_log: produz { style.stroke-dash: 2 }
+
+engineer: Engenheiro de plantão (2h13) { shape: person }
+engineer -> gateway_log: "abre log 1" { style.stroke-dash: 3 }
+engineer -> orders_log: "abre log 2" { style.stroke-dash: 3 }
+engineer -> payment_log: "abre log 3" { style.stroke-dash: 3 }
+
+note: |md
+  Nenhum log tem um jeito de dizer
+  "esses três são sobre o mesmo pedido".
+  45 minutos juntando o quebra-cabeça manualmente.
+| {
+  style.fill: "#FFF5F5"
+  style.stroke: "#E53E3E"
+}

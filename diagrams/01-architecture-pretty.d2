@@ -1,0 +1,41 @@
+# O diagrama "bonito" aprovado na design review — só caixinhas e setinhas.
+# Sem nenhuma anotação de observabilidade. Usado no cold open (seção 1).
+
+sketch: true
+
+direction: right
+
+classes: {
+  svc: {
+    style.fill: "#4A90D9"
+    style.font-color: white
+    style.border-radius: 6
+  }
+  store: {
+    shape: cylinder
+    style.fill: "#48BB78"
+    style.font-color: white
+  }
+  queue: {
+    shape: queue
+    style.fill: "#ECC94B"
+    style.font-color: "#1A202C"
+  }
+  external: {
+    style.fill: "#999999"
+    style.font-color: white
+  }
+}
+
+client: Cliente { shape: person }
+gateway: API Gateway { class: svc }
+orders_q: Fila de Pedidos { class: queue }
+payment: Serviço de Pagamento { class: svc }
+provider: Provedor de Pagamento Externo { class: external }
+db: Banco de Dados { class: store }
+
+client -> gateway: HTTP
+gateway -> orders_q: enqueue(pedido)
+orders_q -> payment: process(pedido)
+payment -> provider: charge()
+payment -> db: write

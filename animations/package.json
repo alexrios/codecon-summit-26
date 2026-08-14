@@ -1,0 +1,15 @@
+{
+  "name": "codecon-summit-26-animations",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "node render-all.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.355",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "4.0.355"
+  }
+}

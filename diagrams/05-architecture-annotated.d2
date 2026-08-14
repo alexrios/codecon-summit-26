@@ -1,0 +1,60 @@
+# Mesmo diagrama do cold open (01), agora anotado com as perguntas de
+# investigabilidade que deveriam entrar na design review. O "antes vs depois"
+# da tese da talk. Usado na seção 5 e reaproveitado no fechamento (seção 6).
+
+sketch: true
+
+direction: right
+
+classes: {
+  svc: {
+    style.fill: "#4A90D9"
+    style.font-color: white
+    style.border-radius: 6
+  }
+  store: {
+    shape: cylinder
+    style.fill: "#48BB78"
+    style.font-color: white
+  }
+  queue: {
+    shape: queue
+    style.fill: "#ECC94B"
+    style.font-color: "#1A202C"
+  }
+  external: {
+    style.fill: "#999999"
+    style.font-color: white
+  }
+  question: {
+    style.fill: "#FFF5F5"
+    style.stroke: "#E53E3E"
+    style.font-size: 12
+    style.italic: true
+  }
+}
+
+client: Cliente { shape: person }
+gateway: API Gateway { class: svc }
+orders_q: Fila de Pedidos { class: queue }
+payment: Serviço de Pagamento { class: svc }
+provider: Provedor de Pagamento Externo { class: external }
+db: Banco de Dados { class: store }
+
+client -> gateway: HTTP
+gateway -> orders_q: "enqueue(pedido)"
+orders_q -> payment: "process(pedido)"
+payment -> provider: "charge()"
+payment -> db: write
+
+q1: "Correlation ID atravessa\no enqueue(), ou morre aqui?" { class: question }
+gateway -> q1 { style.stroke-dash: 3 }
+
+q2: "Essa fila tem dono?\nQuem vê se ela travar?" { class: question }
+orders_q -> q2 { style.stroke-dash: 3 }
+
+q3: "Se o retry rodar 2x,\né idempotente ou cobra\no cliente duas vezes?" { class: question }
+payment -> q3 { style.stroke-dash: 3 }
+
+q4: "Erro original do provider\nsobrevive, ou some\nnum catch genérico?" { class: question }
+provider -> q4 { style.stroke-dash: 3 }
