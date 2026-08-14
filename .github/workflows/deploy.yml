@@ -36,10 +36,14 @@ jobs:
       - uses: actions/configure-pages@v5
       - run: pnpm install --frozen-lockfile
       - run: pnpm slidev build slides.md --base /codecon-summit-26/
-      - run: touch dist/.nojekyll
+      - run: |
+          mkdir -p site/codecon-summit-26
+          cp -r dist/. site/codecon-summit-26/
+          printf '<meta http-equiv="refresh" content="0; url=/codecon-summit-26/">' > site/index.html
+          touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: slides/dist
+          path: slides/site
 
   deploy:
     needs: build
