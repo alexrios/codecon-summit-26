@@ -20,11 +20,19 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: slides
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout talks host
+        uses: actions/checkout@v5
+        with:
+          path: host
+      - name: Checkout spin-mutex
+        uses: actions/checkout@v5
+        with:
+          repository: alexrios/spin-mutex
+          ref: main
+          path: spin-mutex
+          ssh-key: ${{ secrets.SPIN_MUTEX_DEPLOY_KEY }}
+          persist-credentials: false
       - uses: pnpm/action-setup@v4
         with:
           version: 10
@@ -32,21 +40,38 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: slides/pnpm-lock.yaml
+          cache-dependency-path: |
+            host/slides/pnpm-lock.yaml
+            spin-mutex/pnpm-lock.yaml
       - uses: actions/configure-pages@v5
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm slidev build slides.md --base /codecon-summit-26/
-      - run: |
-          mkdir -p site/codecon-summit-26
-          cp -r dist/. site/codecon-summit-26/
+      - name: Build Codecon Summit deck
+        working-directory: host/slides
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm slidev build slides.md --base /codecon-summit-26/
+      - name: Build GopherCon LATAM mutex deck in PT-BR
+        working-directory: spin-mutex
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm slidev build gophercon-latam.pt-br.md \
+            --base /gc-latam-26-mutex-ptbr/ \
+            --router-mode hash \
+            --without-notes \
+            --out dist-pages
+      - name: Assemble Pages site
+        run: |
+          mkdir -p host/slides/site/codecon-summit-26
+          mkdir -p host/slides/site/gc-latam-26-mutex-ptbr
+          cp -r host/slides/dist/. host/slides/site/codecon-summit-26/
+          cp -r spin-mutex/dist-pages/. host/slides/site/gc-latam-26-mutex-ptbr/
           # SPA fallback: GitHub Pages serves 404.html for unknown paths like
           # /codecon-summit-26/2, letting the Slidev router take over.
-          cp dist/index.html site/404.html
-          printf '<meta http-equiv="refresh" content="0; url=/codecon-summit-26/">' > site/index.html
-          touch site/.nojekyll
+          cp host/slides/dist/index.html host/slides/site/404.html
+          printf '<meta http-equiv="refresh" content="0; url=/codecon-summit-26/">' > host/slides/site/index.html
+          touch host/slides/site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: slides/site
+          path: host/slides/site
 
   deploy:
     needs: build
