@@ -66,14 +66,24 @@ jobs:
             --router-mode hash \
             --without-notes \
             --out dist-pages-en
+      - name: Build GopherCon LATAM mutex deck in ES-419
+        working-directory: spin-mutex
+        run: |
+          pnpm slidev build gophercon-latam.es.md \
+            --base /gc-latam-26-mutex-es/ \
+            --router-mode hash \
+            --without-notes \
+            --out dist-pages-es
       - name: Assemble Pages site
         run: |
           mkdir -p host/slides/site/codecon-summit-26
           mkdir -p host/slides/site/gc-latam-26-mutex-ptbr
           mkdir -p host/slides/site/gc-latam-26-mutex-en
+          mkdir -p host/slides/site/gc-latam-26-mutex-es
           cp -r host/slides/dist/. host/slides/site/codecon-summit-26/
           cp -r spin-mutex/dist-pages/. host/slides/site/gc-latam-26-mutex-ptbr/
           cp -r spin-mutex/dist-pages-en/. host/slides/site/gc-latam-26-mutex-en/
+          cp -r spin-mutex/dist-pages-es/. host/slides/site/gc-latam-26-mutex-es/
           # SPA fallback: GitHub Pages serves 404.html for unknown paths like
           # /codecon-summit-26/2, letting the Slidev router take over.
           cp host/slides/dist/index.html host/slides/site/404.html
